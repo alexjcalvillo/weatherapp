@@ -17,20 +17,19 @@ function* rootSaga() {}
 const sagaMiddleware = createSagaMiddleware();
 
 // Example saga setup
-// const movies = (state = [], action) => {
-//     switch (action.type) {
-//         case 'SET_MOVIES':
-//             return action.payload;
-//         default:
-//             return state;
-//     }
-// }
+const movies = (state = [], action) => {
+  switch (action.type) {
+    case 'SET_MOVIES':
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 // Create one store that all components can use
 const storeInstance = createStore(
   combineReducers({
     movies,
-    genres,
   }),
   // Add sagaMiddleware to our store
   applyMiddleware(sagaMiddleware, logger)
