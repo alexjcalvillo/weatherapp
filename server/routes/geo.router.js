@@ -3,6 +3,11 @@ const router = express.Router();
 
 const axios = require('axios');
 
+/*       GET ROUTES       */
+// --------------------- //
+
+// API Call to retreive user location data by ZIPCODE
+// Returns a set of search options - FE will handle these
 router.get('/getlonglat/:zip/:key', (req, res) => {
   const zip = req.params.zip;
   const key = req.params.key;

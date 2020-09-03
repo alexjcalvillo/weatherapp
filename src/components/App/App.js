@@ -24,6 +24,8 @@ import '../../assets/scss/argon-design-system-react.scss';
 class App extends Component {
   state = {
     zip: '',
+    locations: [],
+    currentLocation: '',
   };
 
   handleInput = (event) => {
@@ -38,15 +40,29 @@ class App extends Component {
         `/api/geo/getlonglat/${this.state.zip}/${process.env.REACT_APP_API_KEY}`
       )
       .then((response) => {
-        console.log(response);
+        this.setState({
+          locations: response.data.results,
+        });
       })
       .catch((err) => {
         console.log(err);
         alert("It didn't work.");
       });
+
+    this.setState({
+      zip: '',
+    });
+  };
+
+  setLocation = (location) => (event) => {
+    console.log(location);
+    this.setState({
+      currentLocation: location,
+    });
   };
   // Renders the entire app on the DOM
   render() {
+    console.log(this.state.locations);
     return (
       <div className="App">
         <Header />
@@ -57,6 +73,8 @@ class App extends Component {
         <br />
         <h5 style={{ display: 'inline', marginRight: '10px' }}>High: 81°</h5>
         <h5 style={{ display: 'inline' }}>Low: 69°</h5>
+        <hr />
+        <h4>Location: {this.state.currentLocation}</h4>
         <Container>
           <Card>
             <CardBody>
@@ -85,14 +103,16 @@ class App extends Component {
                         id="zip"
                         bsSize="sm"
                         onChange={this.handleInput}
+                        value={this.state.zip}
                       />
+                      <br />
                       <Button
                         outline
                         color="info"
                         size="sm"
                         onClick={this.getCoordinates}
                       >
-                        Button
+                        Submit
                       </Button>
                     </CardBody>
                   </Card>
@@ -100,7 +120,23 @@ class App extends Component {
                 <Col md="8">
                   <Card inverse style={{ backgroundColor: '#333' }}>
                     <CardBody>
-                      Hello there. These are your coordinates:
+                      Hello there. Did you mean one of these locations?
+                      <hr />
+                      <ul>
+                        {this.state &&
+                          this.state.locations &&
+                          this.state.locations.map((loc, i) => {
+                            return (
+                              <li
+                                key={i}
+                                className="results"
+                                onClick={this.setLocation(loc.formatted)}
+                              >
+                                {loc.formatted}
+                              </li>
+                            );
+                          })}
+                      </ul>
                     </CardBody>
                   </Card>
                 </Col>
