@@ -4,13 +4,17 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "dependencies": {
+    "@creative-tim-official/argon-dashboard-free": "^1.2.0",
     "@material-ui/core": "^3.9.4",
     "axios": "^0.18.1",
+    "node-sass": "^4.14.1",
     "pg": "^8.2.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-redux": "^5.1.2",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
+    "reactstrap": "^8.5.1",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.1.3"
