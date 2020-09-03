@@ -33,7 +33,7 @@ function Header(props) {
     <div>
       <>
         <Navbar
-          className="navbar-horizontal navbar-dark bg-primary"
+          className="navbar-horizontal navbar-dark bg-default"
           // style={{ backgroundColor: '#7A38A6' }}
           expand="lg"
         >
