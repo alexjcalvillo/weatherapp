@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/getlonglat/:zip', (req, res) => {
+const axios = require('axios');
+
+router.get('/getlonglat/:zip/:key', (req, res) => {
   const zip = req.params.zip;
+  const key = req.params.key;
   console.log(zip);
-  console.log(process.env.REACT_APP_API_KEY);
+  console.log(key);
   axios
-    .get(
-      `https://api.opencagedata.com/geocode/v1/json?q=${zip}&key=${process.env.REACT_APP_API_KEY}`
-    )
+    .get(`https://api.opencagedata.com/geocode/v1/json?q=${zip}&key=${key}`)
     .then((response) => {
-      res.send(response);
+      console.log(response.data);
+      res.send(response.data);
     })
     .catch((err) => {
       console.log(err);

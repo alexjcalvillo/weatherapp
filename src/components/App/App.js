@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+
 import './App.css';
 import Header from '../Header/Header';
 
@@ -31,6 +33,17 @@ class App extends Component {
   };
   getCoordinates = () => {
     console.log('getCoordinates', this.state.zip);
+    axios
+      .get(
+        `/api/geo/getlonglat/${this.state.zip}/${process.env.REACT_APP_API_KEY}`
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("It didn't work.");
+      });
   };
   // Renders the entire app on the DOM
   render() {
