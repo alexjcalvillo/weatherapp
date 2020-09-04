@@ -35,4 +35,5 @@
 .results:hover {
   background-color: whitesmoke;
   color: #333;
+  cursor: pointer;
 }

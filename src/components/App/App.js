@@ -5,6 +5,7 @@ import './App.css';
 import Header from '../Header/Header';
 
 import sunny from '../../assets/svgs/Weather icons/sunny.svg';
+import nightclear from '../../assets/svgs/Weather icons/nightclear.svg';
 import {
   Button,
   Card,
@@ -15,6 +16,8 @@ import {
   Label,
   Row,
   Col,
+  CardImg,
+  CardText,
 } from 'reactstrap';
 
 import '../../assets/vendor/nucleo/css/nucleo.css';
@@ -26,6 +29,7 @@ class App extends Component {
     zip: '',
     locations: [],
     currentLocation: '',
+    forecast: {},
   };
 
   handleInput = (event) => {
@@ -57,24 +61,79 @@ class App extends Component {
   setLocation = (location) => (event) => {
     console.log(location);
     this.setState({
-      currentLocation: location,
+      currentLocation: location.formatted,
     });
+    this.getWeather(location.geometry);
   };
+
+  getWeather(geometry) {
+    const lat = geometry.lat;
+    const lng = geometry.lng;
+    axios
+      .get(`https://api.weather.gov/points/${lat},${lng}`)
+      .then((response) => {
+        console.log(response.data);
+        const forecast = response.data.properties.forecast;
+        axios
+          .get(`${forecast}`)
+          .then((response) => {
+            console.log(response.data);
+            const forecast = response.data.properties.periods[0];
+            this.setState({
+              forecast,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            alert("That forecast isn't right.");
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        alert('There was an error with the weather report.');
+      });
+  }
   // Renders the entire app on the DOM
   render() {
     console.log(this.state.locations);
+    let icon = null;
+    if (this.state.forecast.shortForecast === 'Clear') {
+      icon = nightclear;
+    }
     return (
       <div className="App">
         <Header />
         <hr />
-        <h1>Todays weather:</h1>
 
-        <img src={sunny} />
-        <br />
-        <h5 style={{ display: 'inline', marginRight: '10px' }}>High: 81°</h5>
-        <h5 style={{ display: 'inline' }}>Low: 69°</h5>
-        <hr />
-        <h4>Location: {this.state.currentLocation}</h4>
+        {this.state && this.state.forecast && (
+          <Container>
+            <Row>
+              <Card style={{ margin: 'auto', width: '50%' }}>
+                <CardImg
+                  top
+                  style={{
+                    maxWidth: '50%',
+                    maxHeight: '50%',
+                    margin: 'auto',
+                    width: '50%',
+                  }}
+                  src={icon}
+                  alt="icon for the current weather reading"
+                />
+                <CardTitle>
+                  <h3>{this.state.forecast.name}</h3>
+                </CardTitle>
+                <CardBody>
+                  <CardText>{this.state.forecast.shortForecast}</CardText>
+                  <CardText>
+                    {this.state.forecast.temperature}{' '}
+                    {this.state.forecast.temperatureUnit} °
+                  </CardText>
+                </CardBody>
+              </Card>
+            </Row>
+          </Container>
+        )}
         <Container>
           <Card>
             <CardBody>
@@ -130,7 +189,7 @@ class App extends Component {
                               <li
                                 key={i}
                                 className="results"
-                                onClick={this.setLocation(loc.formatted)}
+                                onClick={this.setLocation(loc)}
                               >
                                 {loc.formatted}
                               </li>
@@ -144,14 +203,6 @@ class App extends Component {
             </CardBody>
           </Card>
         </Container>
-        <>
-          <Button className="btn-icon btn-3" color="primary" type="button">
-            <span className="btn-inner--icon">
-              <i className="ni ni-bag-17" />
-            </span>
-            <span className="btn-inner--text">With icon</span>
-          </Button>
-        </>
       </div>
     );
   }
