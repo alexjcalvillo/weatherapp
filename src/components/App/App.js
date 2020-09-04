@@ -4,8 +4,11 @@ import axios from 'axios';
 import './App.css';
 import Header from '../Header/Header';
 
+// Bringing in svgs for weather icon
 import sunny from '../../assets/svgs/Weather icons/sunny.svg';
 import nightclear from '../../assets/svgs/Weather icons/nightclear.svg';
+import cloudysun from '../../assets/svgs/Weather icons/cloudysun.svg';
+
 import {
   Button,
   Card,
@@ -32,11 +35,29 @@ class App extends Component {
     forecast: {},
   };
 
+  componentDidMount() {
+    if ('geolocation' in navigator) {
+      let coords = {};
+      navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position.coords.latitude, position.coords.longitude);
+        coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        this.getLocation(coords);
+        this.getWeather(coords);
+      });
+    } else {
+      console.log('no location');
+    }
+  }
+
   handleInput = (event) => {
     this.setState({
       zip: event.target.value,
     });
   };
+
   getCoordinates = () => {
     console.log('getCoordinates', this.state.zip);
     axios
@@ -57,6 +78,21 @@ class App extends Component {
       zip: '',
     });
   };
+
+  getLocation(coords) {
+    const lng = coords.lng;
+    const lat = coords.lat;
+    axios
+      .get(`/api/geo/getlonglat/${lng}/${lat}/${process.env.REACT_APP_API_KEY}`)
+      .then((response) => {
+        this.setState({
+          currentLocation: response.data.results[0].formatted,
+        });
+      })
+      .catch((err) => {
+        alert('Location cannot be found. Try a different zipcode.');
+      });
+  }
 
   setLocation = (location) => (event) => {
     console.log(location);
@@ -95,59 +131,97 @@ class App extends Component {
   }
   // Renders the entire app on the DOM
   render() {
-    console.log(this.state.locations);
+    console.log(this.state);
     let icon = null;
-    if (this.state.forecast.shortForecast === 'Clear') {
-      icon = nightclear;
+    let color = null;
+    switch (this.state.forecast.shortForecast) {
+      case 'Clear':
+        icon = nightclear;
+        break;
+      case 'Sunny':
+        icon = sunny;
+        color = 'yellow';
+        break;
+      case 'Isolated Rain Showers then Mostly Sunny':
+        icon = cloudysun;
+        break;
+      default:
+        icon = null;
     }
+
     return (
       <div className="App">
         <Header />
-        <hr />
-
-        {this.state && this.state.forecast && (
-          <Container>
-            <Row>
-              <Card style={{ margin: 'auto', width: '50%' }}>
-                <CardImg
-                  top
-                  style={{
-                    maxWidth: '50%',
-                    maxHeight: '50%',
-                    margin: 'auto',
-                    width: '50%',
-                  }}
-                  src={icon}
-                  alt="icon for the current weather reading"
-                />
-                <CardTitle>
-                  <h3>{this.state.forecast.name}</h3>
-                </CardTitle>
-                <CardBody>
-                  <CardText>{this.state.forecast.shortForecast}</CardText>
-                  <CardText>
-                    {this.state.forecast.temperature}{' '}
-                    {this.state.forecast.temperatureUnit} °
-                  </CardText>
-                </CardBody>
-              </Card>
-            </Row>
-          </Container>
-        )}
+        <br />
         <Container>
           <Card>
             <CardBody>
               <CardTitle>Welcome to my Weather Application.</CardTitle>
               <p>
-                This application integrates with the national weather service to
-                get your local weather and give you an accurate look at the day.
+                This application integrates with the National Weather Service
+                API to get your local weather and give you an accurate look at
+                the day.
               </p>
             </CardBody>
           </Card>
         </Container>
+        <hr />
+
+        {this.state && this.state.forecast && (
+          <Container>
+            <Row>
+              <Col sm="8">
+                <Card className="text-center bg-info">
+                  <CardBody>
+                    <CardTitle>
+                      {this.state.forecast
+                        ? this.state.currentLocation
+                        : 'No location selected yet'}
+                    </CardTitle>
+                  </CardBody>
+                  <Row>
+                    <Col sm="3">
+                      <CardImg
+                        top
+                        style={{
+                          justifyContent: 'left',
+                          width: '50%',
+                          display: 'inline-block',
+                          verticalAlign: 'middle',
+                          color: color,
+                        }}
+                        src={icon}
+                        alt="icon for the current weather reading"
+                      />
+                    </Col>
+                    <Col sm="6" style={{ padding: '20px' }}>
+                      <h1
+                        style={{ textAlign: 'left', verticalAlign: 'middle' }}
+                      >
+                        {this.state.forecast.temperature}{' '}
+                        {this.state.forecast.temperatureUnit} °
+                      </h1>
+                    </Col>
+                  </Row>
+                  <CardTitle>
+                    <h3>{this.state.forecast.name}</h3>
+                  </CardTitle>
+                  <CardBody style={{ backgroundColor: '#f6f9fc' }}>
+                    <CardText
+                      style={{ display: 'inline', verticalAlign: 'middle' }}
+                    >
+                      {this.state.forecast.shortForecast}
+                    </CardText>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </Container>
+        )}
+        <br />
         <br />
         <Container>
-          <Card>
+          <Card style={{ marginBottom: '25px' }}>
             <CardBody>
               <Row>
                 <Col md="4">
@@ -177,10 +251,11 @@ class App extends Component {
                   </Card>
                 </Col>
                 <Col md="8">
-                  <Card inverse style={{ backgroundColor: '#333' }}>
-                    <CardBody>
+                  <Card style={{ backgroundColor: '#f6f9fc' }}>
+                    <CardTitle style={{ padding: '10px' }}>
                       Hello there. Did you mean one of these locations?
-                      <hr />
+                    </CardTitle>
+                    <CardBody>
                       <ul>
                         {this.state &&
                           this.state.locations &&

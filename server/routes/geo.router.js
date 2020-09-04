@@ -25,4 +25,23 @@ router.get('/getlonglat/:zip/:key', (req, res) => {
     });
 });
 
+// API Call to retrieve an address using Geolocator Web API coordinates
+// Turns coordinates into human readable print
+router.get('/getlonglat/:lng/:lat/:key', (req, res) => {
+  const LNG = req.params.lng;
+  const LAT = req.params.lat;
+  const key = req.params.key;
+
+  axios
+    .get(
+      `https://api.opencagedata.com/geocode/v1/json?q=${LAT}+${LNG}&key=${key}`
+    )
+    .then((response) => {
+      res.send(response.data);
+    })
+    .catch((err) => {
+      res.sendStatus(500);
+    });
+});
+
 module.exports = router;
