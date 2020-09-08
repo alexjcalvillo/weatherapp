@@ -39,7 +39,7 @@ function Header(props) {
         >
           <Container>
             <NavbarBrand href="#pablo" onClick={(e) => e.preventDefault()}>
-              Default Color
+              Weather...or Not to Run
             </NavbarBrand>
             <button
               aria-controls="navbar-default"
