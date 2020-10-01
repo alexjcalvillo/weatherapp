@@ -60,6 +60,8 @@ How does someone use this application? Tell a user story here.
 - Axios
 - PostgreSQL/Postico
 - PG
+- OpenCage API
+- National Weather Service API
 
 ## Acknowledgement
 
